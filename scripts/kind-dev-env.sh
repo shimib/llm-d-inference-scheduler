@@ -40,7 +40,7 @@ export EPP_IMAGE
 export BATCH_TAG="${BATCH_TAG:-dev}"
 
 # Set a default BATCH_IMAGE if not provided
-BATCH_IMAGE="${BATCH_IMAGE:-${IMAGE_REGISTRY}/llm-d-inference-scheduler:${BATCH_TAG}}"
+BATCH_IMAGE="${BATCH_IMAGE:-${IMAGE_REGISTRY}/llm-d-inference-scheduler-batch:${BATCH_TAG}}"
 export BATCH_IMAGE
 
 # Set the model name to deploy
