@@ -6,11 +6,12 @@ type Flow interface {
 	// starts processing requests.
 	Start(ctx context.Context)
 
-	// returns the channel for requests. Implementation is responsible for populating this channel.
+	// returns the channels for requests. Implementation is responsible for publishing on these channels.
 	RequestChannels() []RequestChannel
-	// returns the channel that accepts messages to be retries with their backoff delay.
+	// returns the channel that accepts messages to be retries with their backoff delay. Implementation is responsible
+	// for consuming messages on this channel.
 	RetryChannel() chan RetryMessage
-	// returns the channel for storing the results.
+	// returns the channel for storing the results. Implementation is responsible for consuming messages on this channel.
 	ResultChannel() chan ResultMessage
 }
 

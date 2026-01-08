@@ -77,6 +77,11 @@ export PD_ENABLED="\"${PD_ENABLED:-false}\""
 # By default we are not setting up for KV cache
 export KV_CACHE_ENABLED="${KV_CACHE_ENABLED:-false}"
 
+# By default we are not setting up Batch and Redis
+export BATCH_REDIS_ENABLED="${BATCH_REDIS_ENABLED:-false}"
+
+
+
 # Replica counts for P and D
 export VLLM_REPLICA_COUNT_P="${VLLM_REPLICA_COUNT_P:-1}"
 export VLLM_REPLICA_COUNT_D="${VLLM_REPLICA_COUNT_D:-2}"
@@ -213,11 +218,13 @@ else
 	kind --name ${CLUSTER_NAME} load docker-image ${SIDECAR_IMAGE}
 fi
 
-# Load the batch image into the cluster
-if [ "${CONTAINER_RUNTIME}" == "podman" ]; then
-	podman save ${BATCH_IMAGE} -o /dev/stdout | kind --name ${CLUSTER_NAME} load image-archive /dev/stdin
-else
-	kind --name ${CLUSTER_NAME} load docker-image ${BATCH_IMAGE}
+ if [ "${BATCH_REDIS_ENABLED}"  == "true" ]; then
+  # Load the batch image into the cluster
+  if [ "${CONTAINER_RUNTIME}" == "podman" ]; then
+    podman save ${BATCH_IMAGE} -o /dev/stdout | kind --name ${CLUSTER_NAME} load image-archive /dev/stdin
+  else
+    kind --name ${CLUSTER_NAME} load docker-image ${BATCH_IMAGE}
+  fi
 fi
 
 # ------------------------------------------------------------------------------
@@ -257,6 +264,14 @@ kustomize build --enable-helm  ${KUSTOMIZE_DIR} \
   ${PD_ENABLED} ${KV_CACHE_ENABLED} ${SIDECAR_IMAGE} ${TARGET_PORTS} \
   ${VLLM_REPLICA_COUNT} ${VLLM_REPLICA_COUNT_P} ${VLLM_REPLICA_COUNT_D} ${VLLM_DATA_PARALLEL_SIZE}' \
   | kubectl --context ${KUBE_CONTEXT} apply -f -
+
+
+if [ "${BATCH_REDIS_ENABLED}"  == "true" ]; then
+  kustomize build --enable-helm deploy/components/batch \
+  | envsubst '${BATCH_NAME} ${BATCH_IMAGE}' \
+  | kubectl --context ${KUBE_CONTEXT} apply --server-side --force-conflicts -f -
+fi
+
 
 # ------------------------------------------------------------------------------
 # Check & Verify
