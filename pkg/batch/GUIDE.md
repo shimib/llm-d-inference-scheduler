@@ -40,12 +40,20 @@ In many environments, expensive AI accelerators sit idle during slight dips in r
 
 ## Installation
 
-The batch processor requires XXX
+Currently there is no Helm chart for the Batch Processor.
+You can create the docker image for the batch processor with:
+
+```bash 
+make image-build-batch
+```
+
+When deploying the Batch Processor, make sure that the message queue is ready as the BP will attempt to subscribe on startup.
 
 ## Command line parameters
 
 - `concurrency`: the number of concurrenct batch workers, default is 8.
 - `endpoint`: Inference gateway endppoint. Batch requests will be sent to this endpoint.
+- `inferenceObjective`: InferenceObjective to use for requests (set as the HTTP header x-gateway-inference-objective if not empty). 
 - `request-merge-policy`: Currently only supporting <u>random-robin</u> policy.
 - `message-queue-impl`: Currently only supporting <u>redis-pubsub</u> for ephemeral Redis-based implementation.
 

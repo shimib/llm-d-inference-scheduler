@@ -86,7 +86,7 @@ func TestSheddedRequest(t *testing.T) {
 	resultChannel := make(chan ResultMessage, 1)
 	ctx := context.Background()
 
-	go Worker(ctx, "http://localhost:30080/v1/completions", httpclient, requestChannel, retryChannel, resultChannel)
+	go Worker(ctx, "http://localhost:30080/v1/completions", "", httpclient, requestChannel, retryChannel, resultChannel)
 	deadline := time.Now().Add(time.Second * 100).Unix()
 
 	requestChannel <- RequestMessage{
@@ -121,7 +121,7 @@ func TestSuccessfulRequest(t *testing.T) {
 	resultChannel := make(chan ResultMessage, 1)
 	ctx := context.Background()
 
-	go Worker(ctx, "http://localhost:30080/v1/completions", httpclient, requestChannel, retryChannel, resultChannel)
+	go Worker(ctx, "http://localhost:30080/v1/completions", "", httpclient, requestChannel, retryChannel, resultChannel)
 
 	deadline := time.Now().Add(time.Second * 100).Unix()
 

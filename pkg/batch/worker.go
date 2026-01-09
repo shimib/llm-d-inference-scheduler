@@ -19,7 +19,7 @@ import (
 
 var baseDelaySeconds = 2
 
-func Worker(ctx context.Context, endpoint string, httpClient *http.Client, requestChannel chan RequestMessage,
+func Worker(ctx context.Context, endpoint string, inferenceObjective string, httpClient *http.Client, requestChannel chan RequestMessage,
 	retryChannel chan RetryMessage, resultChannel chan ResultMessage) {
 
 	logger := log.FromContext(ctx)
@@ -47,7 +47,9 @@ func Worker(ctx context.Context, endpoint string, httpClient *http.Client, reque
 					return
 				}
 				request.Header.Set("Content-Type", "application/json")
-				request.Header.Set("x-gateway-inference-objective", "food-review-2")
+				if inferenceObjective != "" {
+					request.Header.Set("x-gateway-inference-objective", inferenceObjective)
+				}
 
 				result, err := httpClient.Do(request)
 				if err != nil {

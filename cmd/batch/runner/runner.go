@@ -31,6 +31,7 @@ var (
 	logVerbosity        = flag.Int("v", logging.DEFAULT, "number for the log level verbosity")
 	concurrency         = flag.Int("concurrency", 8, "number of concurrent workers")
 	endpoint            = flag.String("endpoint", "http://localhost:30080/v1/completions", "inference endpoint")
+	inferenceObjective  = flag.String("inference-objective", "", "inference objective to use in requests")
 	metricsPort         = flag.Int("metrics-port", runserver.DefaultMetricsPort, "The metrics port")
 	metricsEndpointAuth = flag.Bool("metrics-endpoint-auth", true, "Enables authentication and authorization of the metrics endpoint")
 	requestMergePolicy  = flag.String("request-merge-policy", "random-robin", "The request merge policy to use. Supported policies: random-robin")
@@ -123,7 +124,7 @@ func (r *BatchRunner) Run(ctx context.Context) error {
 
 	requestChannel := policy.MergeRequestChannels(impl.RequestChannels()).Channel
 	for w := 1; w <= *concurrency; w++ {
-		go batch.Worker(ctx, *endpoint, httpClient, requestChannel, impl.RetryChannel(), impl.ResultChannel())
+		go batch.Worker(ctx, *endpoint, *inferenceObjective, httpClient, requestChannel, impl.RetryChannel(), impl.ResultChannel())
 	}
 
 	impl.Start(ctx)
